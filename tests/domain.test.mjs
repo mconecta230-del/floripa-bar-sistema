@@ -205,3 +205,31 @@ test('settles table with multiple split payment methods (Pix + Dinheiro)', () =>
   assert.match(result.table.history[0], /Forma registrada: Pix/)
   assert.match(result.table.history[0], /Dinheiro/)
 })
+
+test('existing local data gains tables 31 to 40 without changing existing tables', () => {
+  const saved = {tables: [{id: 5, status:'ocupada', waiter:'Ana', opened:'10:00', items:[], history:[]}], catalogVersion:4, waiters:[], catalog:[], promotions:[], payments:[], notices:[]}
+  globalThis.localStorage = { getItem: () => JSON.stringify(saved), setItem: () => {} }
+  const loaded = demoRepository.load()
+  assert.equal(loaded.tables.length, 40)
+  assert.equal(loaded.tables.find(t => t.id === 5).waiter, 'Ana')
+  assert.equal(loaded.tables.find(t => t.id === 40).status, 'livre')
+})
+
+test('demo login accepts only the requested test credentials', async () => {
+  const { isDemoLogin } = await import('../src/demo-login.ts')
+  assert.equal(isDemoLogin('admin', '123'), true)
+  assert.equal(isDemoLogin('admin', 'wrong'), false)
+  assert.equal(isDemoLogin('garcom', '123'), false)
+})
+
+test('waiter order adds all selected products to the chosen table', async () => {
+  const { submitWaiterOrder } = await import('../src/waiter-order.ts')
+  const table = { id: 1, status: 'livre', waiter: '', opened: '', items: [], history: [] }
+  const result = submitWaiterOrder(table, [{product:catalog[0].id, quantity:2}, {product:catalog[1].id, quantity:1}], [], catalog, 'Garçom 1', new Date(2026,10,13))
+  assert.equal(result.status, 'ocupada')
+  assert.equal(result.items.length, 2)
+  assert.equal(result.items[0].quantity, 2)
+  assert.equal(result.items[0].server, 'Garçom 1')
+  assert.throws(() => submitWaiterOrder(table, [], [], catalog, 'Garçom 1', new Date()))
+  assert.throws(() => submitWaiterOrder({...table,status:'fechando'}, [{product:catalog[0].id,quantity:1}], [], catalog, 'Garçom 1', new Date()))
+})

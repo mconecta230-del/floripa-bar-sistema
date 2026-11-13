@@ -43,3 +43,7 @@ A próxima etapa de operação compartilhada inclui banco de dados, sincronizaç
 - `public/floripa-marca.png`: logo da referência visual do salão.
 - `docs/superpowers`: especificação e plano históricos da etapa de Caixa. O README descreve o estado atual.
 - `tests/domain.test.mjs`: testes de domínio e catálogo. A última alteração de código passou nos 13 testes e na compilação de produção.
+
+## Prévia de demonstração
+
+A tela inicial oferece os acessos de teste `admin` / `123` e `garcom` / `123`. São verificações locais de demonstração, não autenticação ou proteção de acesso. O garçom vê 40 mesas, pode montar pedidos com os preços base do cardápio e gravá-los no navegador. Os dados não são sincronizados entre aparelhos, e a impressão ainda não está implementada. O projeto Supabase tem uma estrutura inicial, mas o aplicativo ainda não está conectado a ela. Não utilizar esta prévia para operação real.

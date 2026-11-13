@@ -4,7 +4,7 @@ export type Waiter = { id: string; name: string; login: string; pin: string; act
 export type State = { tables: Table[]; promotions: Promotion[]; payments: Payment[]; notices: string[]; catalog:Product[]; catalogVersion:number; waiters: Waiter[] }
 const occupied = [3, 5, 7, 12, 15, 20, 24, 27, 29, 30]
 const seed = (): State => ({
-  tables: Array.from({ length: 30 }, (_, i): Table => {
+  tables: Array.from({ length: 40 }, (_, i): Table => {
     const id = i + 1
     const status = [10, 18].includes(id) ? 'fechando' : occupied.includes(id) ? 'ocupada' : 'livre'
     const items = status === 'livre' ? [] : (id === 5 ? [catalog.find(p=>p.id===1)!, catalog.find(p=>p.id===2)!, catalog.find(p=>p.id===3)!] : [catalog.find(p=>p.id===1)!, catalog.find(p=>p.id===5)!]).map((p, j) => ({
@@ -19,6 +19,7 @@ const seed = (): State => ({
     { id: '2', name: 'Marina', login: 'marina', pin: '1234', active: true, createdAt: '10/11/2026' },
   ],
 })
+const completeTables = (tables: Table[]): Table[] => [...tables, ...Array.from({ length: 40 }, (_, i): Table => ({ id: i + 1, status: 'livre', waiter: '', opened: '', items: [], history: [] })).filter(t => !tables.some(existing => existing.id === t.id))]
 const key = 'floripa-bar-demo-v1'
 export const demoRepository = {
   load(): State {
@@ -26,6 +27,7 @@ export const demoRepository = {
       const raw = localStorage.getItem(key);
       if (raw) {
         const state = JSON.parse(raw) as State;
+        state.tables = completeTables(state.tables || []);
         const defaultWaiters = [
           { id: '1', name: 'Carlos', login: 'carlos', pin: '1234', active: true, createdAt: '10/11/2026' },
           { id: '2', name: 'Marina', login: 'marina', pin: '1234', active: true, createdAt: '10/11/2026' },
